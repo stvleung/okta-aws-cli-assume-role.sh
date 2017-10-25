@@ -57,29 +57,28 @@ if [ ! -d "/opt/okta-aws-cli-assume-role" ]; then
 fi
 
 # Create a configuration directory and download AWS Java SDK if doesn't exist
-if [ ! -d "$CONF_DIR" ]; then
+if [ ! -e "$CONF_DIR/lib/aws-java-sdk.jar" ]; then
     echo
     echo "Creating $CONF_DIR configuration directory"
-    if mkdir -p "$CONF_DIR/lib"; then
-        echo
-        echo Downloading AWS Java SDK
 
-        curl -L                      \
-            -o /tmp/aws-java-sdk.zip \
-            https://sdk-for-java.amazonwebservices.com/latest/aws-java-sdk.zip
+    mkdir -p "$CONF_DIR/lib"
 
-        unzip -jo /tmp/aws-java-sdk.zip        \
-            "*/lib/aws-java-sdk-*.jar"         \
-            -x "*-sources.jar" "*-javadoc.jar" \
-            -d "$CONF_DIR/lib"
+    echo
+    echo Downloading AWS Java SDK
 
-        rm /tmp/aws-java-sdk.zip
+    curl -L                      \
+        -o /tmp/aws-java-sdk.zip \
+        https://sdk-for-java.amazonwebservices.com/latest/aws-java-sdk.zip
 
-        cd "$CONF_DIR/lib"
-        ln -snf $(ls -t aws-java-sdk-*.jar | head -n 1) aws-java-sdk.jar
-    else
-        exit $?
-    fi
+    unzip -jo /tmp/aws-java-sdk.zip        \
+        "*/lib/aws-java-sdk-*.jar"         \
+        -x "*-sources.jar" "*-javadoc.jar" \
+        -d "$CONF_DIR/lib"
+
+    rm /tmp/aws-java-sdk.zip
+
+    cd "$CONF_DIR/lib"
+    ln -snf $(ls -t aws-java-sdk-*.jar | head -n 1) aws-java-sdk.jar
 fi
 
 # Create a configuraiton file if doesn't exist
